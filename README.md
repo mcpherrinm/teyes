@@ -1,2 +1,28 @@
 # teyes
-Teyes watches what you do and reports to the Boss.
+
+It's like xeyes.
+
+
+                XXXXXXXXX                               XXXXXXXXX
+              XXXXXXXXXXXXX                           XXXXXXXXXXXXX
+             XXX         XXX                         XXX         XXX
+            XXX           XXX                       XXX           XXX
+           XX               XX                     XX               XX
+          XXX               XXX                   XXX               XXX
+          XX                 XX                   XX                 XX
+         XX                   XX                 XX                   XX
+         XX                   XX                 XX                   XX
+         XX                   XX                 XX                   XX
+         XX    XXXXX          XX                 XX    XXXXX          XX
+         XX   XXXXXXX         XX                 XX   XXXXXXX         XX
+         XX   XXXXXXX         XX                 XX   XXXXXXX         XX
+         XX   XXXXXXX         XX                 XX   XXXXXXX         XX
+         XX   XXXXXXX         XX                 XX   XXXXXXX         XX
+         XX   XXXXXXX         XX                 XX   XXXXXXX         XX
+          XX   XXXXX         XX                   XX   XXXXX         XX
+          XXX               XXX                   XXX               XXX
+           XX               XX                     XX               XX
+            XXX           XXX                       XXX           XXX
+             XXX         XXX                         XXX         XXX
+              XXXXXXXXXXXXX                           XXXXXXXXXXXXX
+                XXXXXXXXX                               XXXXXXXXX
