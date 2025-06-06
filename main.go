@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	p := tea.NewProgram(model{debug: true}, tea.WithMouseAllMotion(), tea.WithAltScreen())
+	p := tea.NewProgram(model{}, tea.WithMouseAllMotion(), tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("error: %s", err)
 		os.Exit(1)
@@ -31,6 +31,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
 			return m, tea.Quit
+		case "d":
+			// Pressing d turns some debug output on
+			m.debug = !m.debug
 		}
 
 	case tea.MouseMsg:
@@ -46,13 +49,42 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	var art strings.Builder
+	eyeLX := m.winWidth / 4
+	eyeRX := eyeLX + m.winWidth/2
+	eyeY := m.winHeight / 2
+	eyeRadius := m.winHeight / 2
+	if eyeRadius > m.winWidth/2 {
+		eyeRadius = m.winWidth / 2
+	}
 
-	for y := 0; y < m.winHeight; y++ {
-		art.WriteString("\n")
+	pupilVecLX, pupilVecLY := vec(eyeLX, eyeY, m.mouseX, m.mouseY)
+	pupilVecLX, pupilVecLY = clamp(eyeRadius/3, pupilVecLX, pupilVecLY)
+	pupilVecRX, pupilVecRY := vec(eyeRX, eyeY, m.mouseX, m.mouseY)
+	pupilVecRX, pupilVecRY = clamp(eyeRadius/3, pupilVecRX, pupilVecRY)
+
+	s := state{
+		eyeLX:     eyeLX,
+		eyeRX:     eyeRX,
+		eyeY:      eyeY,
+		eyeRadius: eyeRadius,
+
+		pupilVecLX: pupilVecLX,
+		pupilVecLY: pupilVecLY,
+		pupilVecRX: pupilVecRX,
+		pupilVecRY: pupilVecRY,
+	}
+
+	var art strings.Builder
+	if m.debug {
+		art.WriteString(fmt.Sprintf("%d,%d in %dx%d: %+v", m.mouseX, m.mouseY, m.winWidth, m.winHeight, s))
+	}
+	art.WriteString("\n")
+
+	for y := 1; y < m.winHeight-1; y++ {
 		for x := 0; x < m.winWidth; x++ {
-			art.WriteByte(m.eye(x, y))
+			art.WriteByte(m.eye(x, y, s))
 		}
+		art.WriteString("\n")
 	}
 
 	return art.String()
@@ -72,8 +104,42 @@ func inCircle(x, y, centerX, centerY, radius int) bool {
 	return dX*dX+dY*dY < radius*radius
 }
 
+func vec(fromX, fromY, toX, toY int) (int, int) {
+	return toX - fromX, toY - fromY
+}
+
+// clamp magnitude of vector
+func clamp(maxMag, x, y int) (int, int) {
+	// TODO: this should do a vector thing
+	if x > maxMag {
+		x = maxMag
+	}
+	if x < -maxMag {
+		x = -maxMag
+	}
+	if y > maxMag {
+		y = maxMag
+	}
+	if y < -maxMag {
+		y = -maxMag
+	}
+	return x, y
+}
+
+type state struct {
+	eyeLX     int
+	eyeRX     int
+	eyeY      int
+	eyeRadius int
+
+	pupilVecLX int
+	pupilVecLY int
+	pupilVecRX int
+	pupilVecRY int
+}
+
 // eye returns the character to render at an x,y point
-func (m model) eye(x, y int) byte {
+func (m model) eye(x, y int, s state) byte {
 	// Debug mouse position:
 	if m.debug {
 		if x == m.mouseX && y == m.mouseY {
@@ -81,44 +147,28 @@ func (m model) eye(x, y int) byte {
 		}
 	}
 
-	// handle symmetric left-right
-	halfWidth := m.winWidth / 2
-	if x >= halfWidth {
-		x = x - halfWidth
-	}
-
-	eyeX := m.winWidth / 4
-	eyeY := m.winHeight / 2
-	eyeRadius := m.winHeight / 2
-
-	// Pupil:
-	padding := 3
-
-	pupilXOff := m.mouseX - eyeX
-	if pupilXOff > eyeRadius/padding {
-		pupilXOff = eyeRadius / padding
-	}
-	if pupilXOff < -eyeRadius/padding {
-		pupilXOff = -eyeRadius / padding
-	}
-	pupilYOff := m.mouseY - eyeY
-	if pupilYOff > eyeRadius/padding {
-		pupilYOff = eyeRadius / padding
-	}
-	if pupilYOff < -eyeRadius/padding {
-		pupilYOff = -eyeRadius / padding
-	}
-	if inCircle(x, y, eyeX+pupilXOff, eyeY+pupilYOff, eyeRadius/3) {
+	// Left pupil:
+	if inCircle(x, y, s.eyeLX+s.pupilVecLX, s.eyeY+s.pupilVecLY, s.eyeRadius/3) {
 		return 'X'
 	}
 
+	// Right pupil:
+	if inCircle(x, y, s.eyeRX+s.pupilVecRX, s.eyeY+s.pupilVecRY, s.eyeRadius/3) {
+		return 'X'
+	}
+
+	// the rest of the eye is symmetric
+	if x > m.winWidth/2 {
+		x = x - m.winWidth/2
+	}
+
 	// Iris:
-	if inCircle(x, y, eyeX, eyeY, eyeRadius-2) {
+	if inCircle(x, y, s.eyeLX, s.eyeY, s.eyeRadius-2) {
 		return ' '
 	}
 
 	// border:
-	if inCircle(x, y, eyeX, eyeY, eyeRadius) {
+	if inCircle(x, y, s.eyeLX, s.eyeY, s.eyeRadius) {
 		return 'X'
 	}
 
