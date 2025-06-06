@@ -7,6 +7,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+var Options = []tea.ProgramOption{tea.WithAltScreen(), tea.WithMouseAllMotion()}
+
 type Model struct {
 	mouseX, mouseY, winWidth, winHeight int
 	debug                               bool
