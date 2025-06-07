@@ -2,6 +2,8 @@
 
 It's like xeyes.
 
+Try it online: `ssh teyes.fly.dev`
+
 
                 XXXXXXXXX                               XXXXXXXXX
               XXXXXXXXXXXXX                           XXXXXXXXXXXXX
