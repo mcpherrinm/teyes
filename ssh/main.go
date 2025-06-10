@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/pem"
 	"errors"
 	"net"
 	"os"
@@ -20,11 +22,34 @@ import (
 )
 
 func main() {
-	// TODO: flags
-	host := "0.0.0.0"
-	port := "2222"
+	host, ok := os.LookupEnv("LISTEN_HOST")
+	if !ok {
+		host = "0.0.0.0"
+	}
+	port, ok := os.LookupEnv("LISTEN_PORT")
+	if !ok {
+		port = "2222"
+	}
+
+	key, ok := os.LookupEnv("SSH_PRIVATE_KEY")
+	if !ok {
+		log.Fatal("SSH_PRIVATE_KEY not set")
+	}
+
+	// Wish wants the host key in PEM, so we need to convert
+	rawKey, err := base64.StdEncoding.DecodeString(key)
+	if err != nil {
+		log.Fatalf("Decoding private key: %s", err)
+	}
+
+	// Encode rawKey to PEM:
+	keyPem := pem.EncodeToMemory(&pem.Block{
+		Type:  "OPENSSH PRIVATE KEY",
+		Bytes: rawKey,
+	})
 
 	s, err := wish.NewServer(
+		wish.WithHostKeyPEM(keyPem),
 		wish.WithAddress(net.JoinHostPort(host, port)),
 		wish.WithMiddleware(
 			bubbletea.Middleware(teaHandler),
