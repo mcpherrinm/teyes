@@ -120,6 +120,11 @@ func (m Model) eye(x, y int, s state) byte {
 		x = x - m.winWidth/2
 	}
 
+	// Outside the circle is background
+	if !inCircle(x, y, s.eyeLX, s.eyeY, s.eyeRadius) {
+		return ' '
+	}
+
 	// Pupil:
 	if inCircle(x, y, s.eyeLX+s.pupilVecX, s.eyeY+s.pupilVecY, s.eyeRadius/3) {
 		return 'X'
@@ -130,11 +135,6 @@ func (m Model) eye(x, y int, s state) byte {
 		return ' '
 	}
 
-	// border:
-	if inCircle(x, y, s.eyeLX, s.eyeY, s.eyeRadius) {
-		return 'X'
-	}
-
-	// background:
-	return ' '
+	// Border:
+	return 'X'
 }
