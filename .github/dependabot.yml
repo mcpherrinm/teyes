@@ -1,18 +1,15 @@
 version: 2
 updates:
-  # Enable version updates for Go modules
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "monthly"
 
-  # Enable version updates for Docker
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "monthly"
 
-  # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
