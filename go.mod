@@ -6,7 +6,7 @@ toolchain go1.24.2
 
 require (
 	github.com/charmbracelet/bubbletea v1.3.10
-	github.com/charmbracelet/log v0.4.1
+	github.com/charmbracelet/log v0.4.2
 	github.com/charmbracelet/ssh v0.0.0-20250128164007-98fd5ae11894
 	github.com/charmbracelet/wish v1.4.7
 )
