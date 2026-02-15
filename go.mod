@@ -1,8 +1,6 @@
 module github.com/mcpherrinm/teyes
 
-go 1.24.0
-
-toolchain go1.24.2
+go 1.26.0
 
 require (
 	github.com/charmbracelet/bubbletea v1.3.10
