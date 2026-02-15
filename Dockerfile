@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.26
+ARG GO_VERSION=1
 FROM golang:${GO_VERSION}-bookworm as builder
 
 WORKDIR /usr/src/app
